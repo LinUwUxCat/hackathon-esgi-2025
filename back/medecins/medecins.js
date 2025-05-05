@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { logError } = require('./../logger/logger');
 
 router.get('/', async (res) => {
 
@@ -15,6 +16,13 @@ router.get('/', async (res) => {
         });
 
         const json = await response.json();
+
+        if(response.status !== 200){
+            logError("Erreur venant de l'API distante: -> " + json);
+            res.status(response.status);
+            res.send(response);
+            return;
+        }
 
         if (json.results.length === 0) {
             isFinished = true;
@@ -50,6 +58,13 @@ router.get('/insee', async (req, res) => {
         });
 
         const json = await response.json();
+
+        if(response.status !== 200){
+            logError("Erreur venant de l'API distante: -> " + json);
+            res.status(response.status);
+            res.send(response);
+            return;
+        }
 
         if (json.results.length === 0) {
             isFinished = true;
