@@ -4,7 +4,7 @@ const demoRoutes = require('./demo/demo');
 
 const app = express();
 
-app.get('/ready', (res) => {
+app.get('/ready', (req, res) => {
     res.status(200);
     res.send("API is running.");
 });

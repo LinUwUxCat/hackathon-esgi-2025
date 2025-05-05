@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { logError } = require('./../logger/logger');
 
-router.get('/', async (res) => {
+router.get('/', async (req, res) => {
 
     let results = [];
     let offset = 0;
