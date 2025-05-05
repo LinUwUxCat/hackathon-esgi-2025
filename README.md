@@ -5,7 +5,7 @@
 1️⃣ **Cloner le dépôt :**
 
 ```bash
-git https://github.com/LinUwUxCat/hackathon-esgi-2025
+git clone https://github.com/LinUwUxCat/hackathon-esgi-2025
 cd hackathon-esgi-2025
 ```
 
