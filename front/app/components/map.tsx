@@ -1,28 +1,69 @@
-import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
-import  HeatmapLayer from "react-leaflet-heat-layer"
+import { GeoJSON, MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { useEffect, useState } from "react";
+import L, { LatLng } from "leaflet";
+import HeatmapLayer from "react-leaflet-heat-layer";
+import getAisneGeoJSON from "~/services/aisne-geography";
+import { getDoctorLatLongs } from "~/services/doctor-lat-long";
 
-export default function DoctorMap() {
-  
+type PegmanDropHandlerProps = {
+  pegmanDropPosition: { x: number; y: number } | null;
+};
+
+function PegmanDropHandler({ pegmanDropPosition }: PegmanDropHandlerProps) {
+  const map = useMap();
+  const [latlng, setLatlng] = useState<LatLng | null>(null);
+
+  useEffect(() => {
+    if (!pegmanDropPosition || !map) return;
+
+    const mapBounds = map.getContainer().getBoundingClientRect();
+
+    const relativeX = pegmanDropPosition.x - mapBounds.left;
+    const relativeY = pegmanDropPosition.y - mapBounds.top;
+
+    const latLng = map.containerPointToLatLng([relativeX, relativeY]);
+    setLatlng(latLng);
+  }, [pegmanDropPosition, map]);
+
+  return latlng ? (
+    <Marker position={[latlng.lat, latlng.lng]}>
+      <Popup>
+        Coordonnées :<br />
+        Lat: {latlng.lat.toFixed(5)}<br />
+        Lng: {latlng.lng.toFixed(5)}
+      </Popup>
+    </Marker>
+  ) : null;
+}
+
+type DoctorMapProps = {
+  pegmanDropPosition: { x: number; y: number } | null;
+};
+
+export default function DoctorMap({ pegmanDropPosition }: DoctorMapProps) {
+  const [positions, setPositions] = useState<Number[][]>([]);
+  useEffect(() => {
+    getDoctorLatLongs().then(pos => setPositions(pos));
+  }, []);
   return (
-    <MapContainer center={[49.4904, 3.7587]} zoom={10} scrollWheelZoom={true} style={{ height : "95vh", width: "100vw"}}>
-      <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+    <MapContainer
+      center={[49.4904, 3.7587]}
+      zoom={12}
+      scrollWheelZoom={true}
+      style={{ height: "100vh", width: "100vw" }}
+    >
+      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+      <GeoJSON data={getAisneGeoJSON()} style={() => {return {fill:false}}}/>
+      <HeatmapLayer
+        latlngs={positions}
+        minOpacity={0.3}
       />
-      <HeatmapLayer latlngs={[
-        [49.4904, 3.7587, 5.0],
-        [49.4904, 3.7597, 1.0],
-        [49.4904, 3.7687, 1.0],
-        [49.4904, 3.7787, 1.0],
-        [49.4904, 3.7887, 1.0],
-        [49.4904, 3.7987, 1.0],
-        [49.4904, 3.9587, 1.0]
-      ]} minOpacity={0.5} />
-      <Marker position={[49.4904, 3.7587]}>
-        <Popup>
-          A pretty CSS3 popup. <br /> Easily customizable.
-        </Popup>
-      </Marker>
-    </MapContainer>
 
+      <Marker position={[49.4904, 3.7587]}>
+        <Popup>Point de départ</Popup>
+      </Marker>
+
+      <PegmanDropHandler pegmanDropPosition={pegmanDropPosition} />
+    </MapContainer>
   );
 }
