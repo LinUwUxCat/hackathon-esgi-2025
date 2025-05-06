@@ -1,5 +1,6 @@
 import DoctorMap from "~/components/map";
 import type { Route } from "./+types/home";
+import MapAndPegman from '../components/map&pegman';
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -10,6 +11,8 @@ export function meta({}: Route.MetaArgs) {
 
 export default function Home() {
   return (
-    <DoctorMap />
+    <>
+    <MapAndPegman />
+    </>
   );
 }
