@@ -9,7 +9,7 @@
   "scripts": {
     "test": "jest",
     "dev": "nodemon index.js",
-    "coverage-test": "jest --coverage"
+    "coverage-test": "jest --coverage --runInBand --force-exit"
   },
   "dependencies": {
     "body-parser": "^2.2.0",
