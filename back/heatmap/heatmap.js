@@ -4,6 +4,7 @@ const { getAllDemo, getAllCoord } = require('./../services/demo');
 const { getMedecins } = require('./../services/medecins');
 
 router.get('/', async (req, res) => {
+
     try {
         const demo = getAllDemo();
         const medecins = await getMedecins();
@@ -12,8 +13,12 @@ router.get('/', async (req, res) => {
 
         const result = await Promise.all(
             Object.entries(demo).map(async ([insee, data]) => {
+
+                let added = req.insee_list.find(item => item.insee == insee);
+                let nb_med = added.nb_med ?? 0;
+
                 const nb_hab = parseInt(data.nb_hab, 10);
-                const nb_med = medecins[insee]?.nb_med || 0;
+                nb_med += medecins[insee]?.nb_med ?? 0;
                 const ratio = nb_med > 0 ? (nb_hab / nb_med).toFixed(2) : 0;
                 const lat = coord[insee]?.coord?.lat || null;
                 const lon = coord[insee]?.coord?.lon || null;
