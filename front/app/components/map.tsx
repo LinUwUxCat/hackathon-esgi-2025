@@ -1,7 +1,9 @@
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { GeoJSON, MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import { useEffect, useState } from "react";
 import L, { LatLng } from "leaflet";
 import HeatmapLayer from "react-leaflet-heat-layer";
+import getAisneGeoJSON from "~/services/aisne-geography";
+import { getDoctorLatLongs } from "~/services/doctor-lat-long";
 
 type PegmanDropHandlerProps = {
   pegmanDropPosition: { x: number; y: number } | null;
@@ -39,6 +41,10 @@ type DoctorMapProps = {
 };
 
 export default function DoctorMap({ pegmanDropPosition }: DoctorMapProps) {
+  const [positions, setPositions] = useState<Number[][]>([]);
+  useEffect(() => {
+    getDoctorLatLongs().then(pos => setPositions(pos));
+  }, []);
   return (
     <MapContainer
       center={[49.4904, 3.7587]}
@@ -47,18 +53,10 @@ export default function DoctorMap({ pegmanDropPosition }: DoctorMapProps) {
       style={{ height: "100vh", width: "100vw" }}
     >
       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-
+      <GeoJSON data={getAisneGeoJSON()} style={() => {return {fill:false}}}/>
       <HeatmapLayer
-        latlngs={[
-          [49.4904, 3.7587, 5.0],
-          [49.4904, 3.7597, 1.0],
-          [49.4904, 3.7687, 1.0],
-          [49.4904, 3.7787, 1.0],
-          [49.4904, 3.7887, 1.0],
-          [49.4904, 3.7987, 1.0],
-          [49.4904, 3.9587, 1.0],
-        ]}
-        minOpacity={0.5}
+        latlngs={positions}
+        minOpacity={0.3}
       />
 
       <Marker position={[49.4904, 3.7587]}>
