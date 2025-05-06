@@ -7,11 +7,13 @@ import { getDoctorLatLongs } from "~/services/doctor-lat-long";
 
 type PegmanDropHandlerProps = {
   pegmanDropPosition: { x: number; y: number } | null;
+  additional: LatLng[]
+  setAdditional: Function
 };
 
-function PegmanDropHandler({ pegmanDropPosition }: PegmanDropHandlerProps) {
+function PegmanDropHandler({ pegmanDropPosition, additional, setAdditional }: PegmanDropHandlerProps) {
   const map = useMap();
-  const [latlng, setLatlng] = useState<LatLng | null>(null);
+  const [latlng, setLatlng] = useState<LatLng[]>([]);
 
   useEffect(() => {
     if (!pegmanDropPosition || !map) return;
@@ -22,18 +24,22 @@ function PegmanDropHandler({ pegmanDropPosition }: PegmanDropHandlerProps) {
     const relativeY = pegmanDropPosition.y - mapBounds.top;
 
     const latLng = map.containerPointToLatLng([relativeX, relativeY]);
-    setLatlng(latLng);
+
+    setAdditional([...additional, { lat: latLng.lat, lon: latLng.lng, nb_med: 100 }])
+
+    setLatlng([...latlng, latLng]);
   }, [pegmanDropPosition, map]);
 
-  return latlng ? (
-    <Marker position={[latlng.lat, latlng.lng]}>
-      <Popup>
-        Coordonnées :<br />
-        Lat: {latlng.lat.toFixed(5)}<br />
-        Lng: {latlng.lng.toFixed(5)}
-      </Popup>
-    </Marker>
-  ) : null;
+  return latlng.length != 0 ?
+    latlng.map(l => (
+      <Marker position={[l.lat, l.lng]}>
+        <Popup>
+          Coordonnées :<br />
+          Lat: {l.lat.toFixed(5)}<br />
+          Lng: {l.lng.toFixed(5)}
+        </Popup>
+      </Marker>
+    )) : null;
 }
 
 type DoctorMapProps = {
@@ -41,10 +47,15 @@ type DoctorMapProps = {
 };
 
 export default function DoctorMap({ pegmanDropPosition }: DoctorMapProps) {
-  const [positions, setPositions] = useState<Number[][]>([]);
+  const [positions, setPositions] = useState<LatLng[]>([]);
+  const [additional, setAdditional] = useState([]);
   useEffect(() => {
-    getDoctorLatLongs().then(pos => setPositions(pos));
-  }, []);
+    getDoctorLatLongs(additional).then(pos => {
+      //console.log(pos.filter(a => a.insee=="02553"), positions.filter(a => a.insee=="02553"))
+      setPositions(pos)
+    });
+  }, [additional]);
+
   return (
     <MapContainer
       center={[49.4904, 3.7587]}
@@ -53,17 +64,23 @@ export default function DoctorMap({ pegmanDropPosition }: DoctorMapProps) {
       style={{ height: "100vh", width: "100vw" }}
     >
       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-      <GeoJSON data={getAisneGeoJSON()} style={() => {return {fill:false}}}/>
-      <HeatmapLayer
-        latlngs={positions}
-        minOpacity={0.3}
-      />
+      <GeoJSON data={getAisneGeoJSON()} style={() => { return { fill: false } }} />
+      <HeatMap positions={positions}/>
 
-      <Marker position={[49.4904, 3.7587]}>
-        <Popup>Point de départ</Popup>
-      </Marker>
-
-      <PegmanDropHandler pegmanDropPosition={pegmanDropPosition} />
+      <PegmanDropHandler pegmanDropPosition={pegmanDropPosition} additional={additional} setAdditional={setAdditional} />
     </MapContainer>
   );
+}
+
+function HeatMap ({positions} : {positions : LatLng[]}) {
+  const map = useMap();
+  return (
+    <HeatmapLayer
+        latlngs={positions}
+        minOpacity={0.3}
+        radius={50}
+        // radius={map.getZoom() * 5}
+        maxZoom={13}
+      />
+  )
 }
