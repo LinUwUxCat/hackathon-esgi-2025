@@ -19,7 +19,7 @@ router.get('/', async (req, res) => {
         const json = await response.json();
 
         if(response.status !== 200){
-            logError("Erreur venant de l'API distante: -> " + json);
+            logError(response);
             res.status(response.status);
             res.send(response);
             return;

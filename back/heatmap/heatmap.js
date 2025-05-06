@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { getAllDemo, getAllCoord } = require('./../services/demo');
 const { getMedecins } = require('./../services/medecins');
+const { logError } = require('../logger/logger');
 
 router.get('/', async (req, res) => {
 
@@ -9,7 +10,6 @@ router.get('/', async (req, res) => {
         const demo = getAllDemo();
         const medecins = await getMedecins();
         const coord = getAllCoord();
-        console.log(coord);
 
         const result = await Promise.all(
             Object.entries(demo).map(async ([insee, data]) => {
@@ -36,7 +36,7 @@ router.get('/', async (req, res) => {
 
         res.status(200).json(result);
     } catch (error) {
-        console.error(error);
+        logError(error);
         res.status(500).json({ error: 'Erreur lors de la récupération des données' });
     }
 });
