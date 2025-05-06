@@ -79,7 +79,7 @@ function HeatMap ({positions} : {positions : LatLng[]}) {
         latlngs={positions}
         minOpacity={0.3}
         radius={50}
-        // radius={map.getZoom() * 5}
+        gradient={{0: 'red', 0.99687: 'green', 1: 'blue'}}
         maxZoom={13}
       />
   )
