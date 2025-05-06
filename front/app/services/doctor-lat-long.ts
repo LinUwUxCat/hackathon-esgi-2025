@@ -1,12 +1,10 @@
 async function getDoctorLatLongs() : Promise<Number[][]> {
+    const res = await (await fetch("http://localhost:3050/heatmap")).json();
+    const max = Math.max(...res.map((e: { ratio: number; }) => Number(e.ratio)));
+    ///TODO en gros faire ratio = ratio / max et après mettre ça en intensité
     const def = [49.4904, 3.7587];
-    let pos = [];
-    for (let i = 0; i < 1000; i++){
-        pos.push([
-            def[0] + (Math.random() - 0.5) / 2,
-            def[1] + (Math.random() - 0.5) / 1,
-        ])
-    } 
-    return pos;
+    res.map((e: { ratio: number; }) => e.ratio = e.ratio / max);
+    res.map((e:any) => [e.lat, e.lon, e.ratio])
+    return res;
 }
 export {getDoctorLatLongs}
