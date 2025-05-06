@@ -19,13 +19,11 @@ jobs:
       - name: Install dependencies
         run: npm i
 
-      - name: Start server in background
+      - name: Start server in background and do tests
         run: |
           npm run dev & 
-          sleep 10
-
-      - name: Test and coverage
-        run: npm run coverage-test
+          sleep 10 &&
+          npm run coverage-test
 
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v4
