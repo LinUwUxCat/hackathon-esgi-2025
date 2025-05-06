@@ -4,7 +4,7 @@ const { getAllDemo, getAllCoord } = require('./../services/demo');
 const { getMedecins } = require('./../services/medecins');
 const { logError } = require('../logger/logger');
 
-router.get('/', async (req, res) => {
+router.post('/', async (req, res) => {
 
     const demo = getAllDemo();
     const medecins = await getMedecins();
