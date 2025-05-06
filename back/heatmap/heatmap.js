@@ -22,7 +22,9 @@ router.post('/', async (req, res) => {
                     if (medecins[data[0].code]) {
                         medecins[data[0].code].nb_med += element.nb_med;
                     } else {
-                        medecins[data[0].code] = { nb_med: element.nb_med };
+                        medecins[data[0].code] = { 
+                            nb_med: element.nb_med,
+                        };
                     }
                 } catch (err) {
                     logError(err);
@@ -42,20 +44,20 @@ router.post('/', async (req, res) => {
         const result = await Promise.all(
             Object.entries(medecins).map(async ([insee, data]) => {
 
+                const lat = coord[insee]?.coord?.lat || null;
+                const lon = coord[insee]?.coord?.lon || null;
+
                 const nb_med = parseInt(data.nb_med, 10) ?? 0;
                 const nb_hab = demo[insee]?.nb_hab ?? 0;
                 let ratio = 0;
-                if(nb_med == 0){
+                if(nb_med === 0){
                     ratio = 0;
-                }else if(nb_hab == 0){
-                    ratio = 1;
+                }else if(nb_hab === 0){
+                    ratio = 0;
                 }else{
                     ratio = nb_med / nb_hab;
                 }
                 maxRatio = ratio > maxRatio ? ratio : maxRatio;
-                
-                const lat = coord[insee]?.coord?.lat || null;
-                const lon = coord[insee]?.coord?.lon || null;
                 
                 return {
                     insee,
