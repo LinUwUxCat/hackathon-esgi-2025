@@ -21,9 +21,8 @@ jobs:
 
       - name: Start server in background
         run: |
-          npm run dev &
-          echo "Waiting for server to start..."
-          npx wait-on http://localhost:3050
+          npm run dev & 
+          sleep 10
 
       - name: Test and coverage
         run: npm run coverage-test
