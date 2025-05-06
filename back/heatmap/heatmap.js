@@ -6,19 +6,30 @@ const { logError } = require('../logger/logger');
 
 router.post('/', async (req, res) => {
 
+    const { insee_list } = req.body;
+
     const demo = getAllDemo();
     const medecins = await getMedecins();
     const coord = getAllCoord();
 
     try{
-        req.insee_list.forEach(async element => {
-            const res = await fetch(`https://geo.api.gouv.fr/communes?lat=${element.lat}&lon=${element.lon}`).json();
-            if(medecins[res[0].code]){
-                medecins[res[0].code].nb_med += element.nb_med;
-            }else{
-                medecins[res[0].code] = element.nb_med;
+        if(insee_list){
+            for (const element of insee_list) {
+                try {
+                    const response = await fetch(`https://geo.api.gouv.fr/communes?lat=${element.lat}&lon=${element.lon}`);
+                    const data = await response.json();
+            
+                    if (medecins[data[0].code]) {
+                        medecins[data[0].code].nb_med += element.nb_med;
+                    } else {
+                        medecins[data[0].code] = { nb_med: element.nb_med };
+                    }
+                } catch (err) {
+                    logError(err);
+                }
             }
-        });
+        }
+        
     }catch (error){
         logError(error);
         return;
@@ -36,7 +47,7 @@ router.post('/', async (req, res) => {
                 let ratio = 0;
                 if(nb_med == 0){
                     ratio = 0;
-                }else if(nb_hab = 0){
+                }else if(nb_hab == 0){
                     ratio = 1;
                 }else{
                     ratio = nb_med / nb_hab;
@@ -45,7 +56,7 @@ router.post('/', async (req, res) => {
                 
                 const lat = coord[insee]?.coord?.lat || null;
                 const lon = coord[insee]?.coord?.lon || null;
-
+                
                 return {
                     insee,
                     nb_hab,

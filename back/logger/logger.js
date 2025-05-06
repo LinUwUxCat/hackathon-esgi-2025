@@ -3,6 +3,11 @@ const path = require('path');
 
 // Chemin du fichier log
 const logFilePath = path.join(__dirname, 'logger.txt');
+if(fs.existsSync(logFilePath)){
+  fs.writeFile(logFilePath);
+}
+
+logError("Initialize logger.");
 
 // Fonction réutilisable
 function logError(message) {
