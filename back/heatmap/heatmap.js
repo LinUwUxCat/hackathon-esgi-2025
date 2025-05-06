@@ -6,57 +6,58 @@ const { logError } = require('../logger/logger');
 
 router.post('/', async (req, res) => {
 
-    const { insee_list } = req.body;
-
     const demo = getAllDemo();
     const medecins = await getMedecins();
     const coord = getAllCoord();
 
-    try{
-        if(insee_list){
-            for (const element of insee_list) {
-                try {
-                    const response = await fetch(`https://geo.api.gouv.fr/communes?lat=${element.lat}&lon=${element.lon}`);
-                    const data = await response.json();
-            
-                    if (medecins[data[0].code]) {
-                        medecins[data[0].code].nb_med += element.nb_med;
-                    } else {
-                        medecins[data[0].code] = { nb_med: element.nb_med };
+    if (req.body != undefined) {
+        const { insee_list } = req.body;
+
+        try {
+            if (insee_list) {
+                for (const element of insee_list) {
+                    try {
+                        const response = await fetch(`https://geo.api.gouv.fr/communes?lat=${element.lat}&lon=${element.lon}`);
+                        const data = await response.json();
+
+                        if (medecins[data[0].code]) {
+                            medecins[data[0].code].nb_med += element.nb_med;
+                        } else {
+                            medecins[data[0].code] = { nb_med: element.nb_med };
+                        }
+                    } catch (err) {
+                        logError(err);
                     }
-                } catch (err) {
-                    logError(err);
                 }
             }
-        }
-        
-    }catch (error){
-        logError(error);
-        return;
-    }
 
+        } catch (error) {
+            logError(error);
+            return;
+        }
+    }
     try {
 
         let maxRatio = 0;
-        
+
         const result = await Promise.all(
             Object.entries(medecins).map(async ([insee, data]) => {
 
                 const nb_med = parseInt(data.nb_med, 10) ?? 0;
                 const nb_hab = demo[insee]?.nb_hab ?? 0;
                 let ratio = 0;
-                if(nb_med == 0){
+                if (nb_med == 0) {
                     ratio = 0;
-                }else if(nb_hab == 0){
+                } else if (nb_hab == 0) {
                     ratio = 1;
-                }else{
+                } else {
                     ratio = nb_med / nb_hab;
                 }
                 maxRatio = ratio > maxRatio ? ratio : maxRatio;
-                
+
                 const lat = coord[insee]?.coord?.lat || null;
                 const lon = coord[insee]?.coord?.lon || null;
-                
+
                 return {
                     insee,
                     nb_hab,
