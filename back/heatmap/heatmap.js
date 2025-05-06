@@ -14,7 +14,7 @@ router.get('/', async (req, res) => {
             Object.entries(demo).map(async ([insee, data]) => {
                 const nb_hab = parseInt(data.nb_hab, 10);
                 const nb_med = medecins[insee]?.nb_med || 0;
-                const ratio = nb_med > 0 ? (nb_hab / nb_med).toFixed(2) : null;
+                const ratio = nb_med > 0 ? (nb_hab / nb_med).toFixed(2) : 0;
                 const lat = coord[insee]?.coord?.lat || null;
                 const lon = coord[insee]?.coord?.lon || null;
 
