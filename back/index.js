@@ -3,9 +3,11 @@ const medecins = require('./medecins/medecins')
 const demoRoutes = require('./demo/demo');
 const heatmap = require('./heatmap/heatmap');
 const cors = require("cors");
+const bodyParser = require("body-parser")
 
 const app = express();
 app.use(cors())
+app.use(bodyParser.json())
 app.get('/ready', (req, res) => {
     res.status(200);
     res.send("API is running.");

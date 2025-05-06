@@ -4,7 +4,7 @@ const { getAllDemo, getAllCoord } = require('./../services/demo');
 const { getMedecins } = require('./../services/medecins');
 const { logError } = require('../logger/logger');
 
-router.get('/', async (req, res) => {
+router.post('/', async (req, res) => {
 
     try {
         const demo = getAllDemo();
@@ -14,8 +14,9 @@ router.get('/', async (req, res) => {
         const result = await Promise.all(
             Object.entries(demo).map(async ([insee, data]) => {
 
-                let added = req.insee_list.find(item => item.insee == insee);
-                let nb_med = added.nb_med ?? 0;
+                let added = req.body.insee_list.find(item => item.insee == insee);
+                let nb_med = 0;
+                if (added) nb_med = added.nb_med;
 
                 const nb_hab = parseInt(data.nb_hab, 10);
                 nb_med += medecins[insee]?.nb_med ?? 0;
