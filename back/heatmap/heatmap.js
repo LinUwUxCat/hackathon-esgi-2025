@@ -14,7 +14,6 @@ router.post('/', async (req, res) => {
         try{
             req.insee_list.forEach(async element => {
                 const res = await fetch(`https://geo.api.gouv.fr/communes?lat=${element.lat}&lon=${element.lon}`).json();
-                let value = medecins.find(item => item.code_insee == res[0].code);
                 if(medecins[res[0].code]){
                     medecins[res[0].code].nb_med += element.nb_med;
                 }else{
