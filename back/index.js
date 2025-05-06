@@ -17,4 +17,11 @@ app.use('/medecins', medecins);
 app.use('/demo', demoRoutes);
 app.use('/heatmap', heatmap);
 
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
+
+const swaggerDocument = YAML.load('./docs/swagger.yaml');
+
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 app.listen(3050);
