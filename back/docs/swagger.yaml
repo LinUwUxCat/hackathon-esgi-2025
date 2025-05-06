@@ -1,0 +1,51 @@
+openapi: 3.0.4
+info:
+  title: HackathonAPI - Aisne
+  version: 1.0.0
+servers:
+  - url: http://localhost:3050
+paths:
+  /medecines:
+    get:
+      summary: Medecines with their latitude and longitude position
+      responses:
+        '200':
+          description: Success
+  /demo:
+    get:
+      summary: List of the demography based on the INSEE code
+      parameters:
+        - name: insee
+          in: query
+          description: Get specific INSEE demography
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+  /heatmap:
+    post:
+      summary: Get the heatmap with a ratio
+      requestBody:
+        description: Add medicines to the current list for heatmap
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                insee_list:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      insee:
+                        type: string
+                        example: "xxxxx"
+                      nb_med:
+                        type: integer
+                        example: 12
+      responses:
+        '200':
+          description: Success
