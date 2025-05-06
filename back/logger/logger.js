@@ -4,6 +4,8 @@ const path = require('path');
 // Chemin du fichier log
 const logFilePath = path.join(__dirname, 'logger.txt');
 
+logError("Initialize logger.");
+
 // Fonction réutilisable
 function logError(message) {
   const timestamp = new Date().toISOString();
