@@ -74,10 +74,10 @@ function getAllCoord() {
     return coords;
 }
 
-async function getCoordByInsee(insee) {
+export async function getCoordByInsee(insee) {
     const coordResponse = await fetch(`https://geo.api.gouv.fr/communes/${insee}?fields=nom,centre,codesPostaux&format=json&geometry=centre`);
-    coord = await coordResponse.json();
-    console.log(coord)
+    let coord = await coordResponse.json();
+    console.log(coord);
 }
 
 module.exports = { getAllDemo, getAllCoord };
