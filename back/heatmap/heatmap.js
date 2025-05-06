@@ -10,20 +10,18 @@ router.post('/', async (req, res) => {
     const medecins = await getMedecins();
     const coord = getAllCoord();
 
-    if(req.insee_list && req.insee_list.length > 0){
-        try{
-            req.insee_list.forEach(async element => {
-                const res = await fetch(`https://geo.api.gouv.fr/communes?lat=${element.lat}&lon=${element.lon}`).json();
-                if(medecins[res[0].code]){
-                    medecins[res[0].code].nb_med += element.nb_med;
-                }else{
-                    medecins[res[0].code] = element.nb_med;
-                }
-            });
-        }catch (error){
-            logError(error);
-            return;
-        }
+    try{
+        req.insee_list.forEach(async element => {
+            const res = await fetch(`https://geo.api.gouv.fr/communes?lat=${element.lat}&lon=${element.lon}`).json();
+            if(medecins[res[0].code]){
+                medecins[res[0].code].nb_med += element.nb_med;
+            }else{
+                medecins[res[0].code] = element.nb_med;
+            }
+        });
+    }catch (error){
+        logError(error);
+        return;
     }
 
     try {
