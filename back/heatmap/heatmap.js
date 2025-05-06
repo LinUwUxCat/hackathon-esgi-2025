@@ -20,7 +20,13 @@ router.post('/', async (req, res) => {
 
                 const nb_hab = parseInt(data.nb_hab, 10);
                 nb_med += medecins[insee]?.nb_med ?? 0;
-                const ratio = nb_med > 0 ? (nb_hab / nb_med).toFixed(2) : 0;
+                let ratio;
+                if(nb_med == 0){
+                    ratio = 0;
+                }else{
+                    ratio = nb_hab > 0 ? (nb_med / nb_hab).toFixed(2) : 1;
+                }
+                
                 const lat = coord[insee]?.coord?.lat || null;
                 const lon = coord[insee]?.coord?.lon || null;
 
