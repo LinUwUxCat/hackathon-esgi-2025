@@ -18,8 +18,16 @@ jobs:
           fetch-depth: 0 
       - name: Install dependencies
         run: npm i
+
+      - name: Start server in background
+        run: |
+          npm run dev &
+          echo "Waiting for server to start..."
+          npx wait-on http://localhost:3050
+
       - name: Test and coverage
         run: npm run coverage-test
+
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v4
         with:
